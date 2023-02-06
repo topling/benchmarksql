@@ -5,41 +5,43 @@ create table bmsql_config (
 
 create table bmsql_warehouse (
   w_id        integer   not null,
-  w_ytd       decimal(12,2),
-  w_tax       decimal(4,4),
+  w_ytd       decimal(16,2),
+  w_tax       decimal(12,4),
   w_name      varchar(10),
   w_street_1  varchar(20),
   w_street_2  varchar(20),
   w_city      varchar(20),
   w_state     char(2),
-  w_zip       char(9)
-);
+  w_zip       char(9),
+  primary key (w_id)
+) partition by hash(`w_id`);
 
 create table bmsql_district (
   d_w_id       integer       not null,
   d_id         integer       not null,
-  d_ytd        decimal(12,2),
-  d_tax        decimal(4,4),
+  d_ytd        decimal(16,2),
+  d_tax        decimal(12,4),
   d_next_o_id  integer,
   d_name       varchar(10),
   d_street_1   varchar(20),
   d_street_2   varchar(20),
   d_city       varchar(20),
   d_state      char(2),
-  d_zip        char(9)
-);
+  d_zip        char(9),
+  primary key (d_w_id, d_id)
+) partition by hash(`d_w_id`);
 
 create table bmsql_customer (
   c_w_id         integer        not null,
   c_d_id         integer        not null,
   c_id           integer        not null,
-  c_discount     decimal(4,4),
+  c_discount     decimal(12,4),
   c_credit       char(2),
   c_last         varchar(16),
   c_first        varchar(16),
-  c_credit_lim   decimal(12,2),
-  c_balance      decimal(12,2),
-  c_ytd_payment  decimal(12,2),
+  c_credit_lim   decimal(16,2),
+  c_balance      decimal(16,2),
+  c_ytd_payment  decimal(16,2),
   c_payment_cnt  integer,
   c_delivery_cnt integer,
   c_street_1     varchar(20),
@@ -50,8 +52,9 @@ create table bmsql_customer (
   c_phone        char(16),
   c_since        timestamp,
   c_middle       char(2),
-  c_data         varchar(500)
-);
+  c_data         varchar(500),
+  primary key (c_w_id, c_d_id, c_id)
+) partition by hash(`c_w_id`);
 
 create sequence bmsql_hist_id_seq;
 
@@ -63,15 +66,16 @@ create table bmsql_history (
   h_d_id   integer,
   h_w_id   integer,
   h_date   timestamp,
-  h_amount decimal(6,2),
+  h_amount decimal(10,2),
   h_data   varchar(24)
-);
+) partition by hash(`h_w_id`);
 
 create table bmsql_new_order (
   no_w_id  integer   not null,
   no_d_id  integer   not null,
-  no_o_id  integer   not null
-);
+  no_o_id  integer   not null,
+  primary key (no_w_id, no_d_id, no_o_id)
+) partition by hash(`no_w_id`);
 
 create table bmsql_oorder (
   o_w_id       integer      not null,
@@ -81,8 +85,9 @@ create table bmsql_oorder (
   o_carrier_id integer,
   o_ol_cnt     integer,
   o_all_local  integer,
-  o_entry_d    timestamp
-);
+  o_entry_d    timestamp,
+  primary key (o_w_id, o_d_id, o_id)
+) partition by hash(`o_w_id`);
 
 create table bmsql_order_line (
   ol_w_id         integer   not null,
@@ -91,19 +96,21 @@ create table bmsql_order_line (
   ol_number       integer   not null,
   ol_i_id         integer   not null,
   ol_delivery_d   timestamp,
-  ol_amount       decimal(6,2),
+  ol_amount       decimal(10,2),
   ol_supply_w_id  integer,
   ol_quantity     integer,
-  ol_dist_info    char(24)
-);
+  ol_dist_info    char(24),
+  primary key (ol_w_id, ol_d_id, ol_o_id, ol_number)
+) partition by hash(`ol_w_id`);
 
 create table bmsql_item (
   i_id     integer      not null,
   i_name   varchar(24),
   i_price  decimal(5,2),
   i_data   varchar(50),
-  i_im_id  integer
-);
+  i_im_id  integer,
+  primary key (i_id)
+) partition by hash(`i_id`);
 
 create table bmsql_stock (
   s_w_id       integer       not null,
@@ -122,7 +129,6 @@ create table bmsql_stock (
   s_dist_07    char(24),
   s_dist_08    char(24),
   s_dist_09    char(24),
-  s_dist_10    char(24)
-);
-
-
+  s_dist_10    char(24),
+  primary key (s_w_id, s_i_id)
+) partition by hash(`s_w_id`);

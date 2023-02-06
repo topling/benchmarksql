@@ -10,4 +10,4 @@ shift
 
 setCP || exit 1
 
-java -cp "$myCP" -Dprop=$PROPS LoadData $*
+java -server -Xms4g -Xmx4g -cp "$myCP" -Dprop=$PROPS LoadData $*
