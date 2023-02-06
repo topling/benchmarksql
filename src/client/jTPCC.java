@@ -13,6 +13,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Pattern;
 import java.text.*;
 
@@ -120,7 +121,9 @@ public class jTPCC implements jTPCCConfig
 	    dbType = DB_ORACLE;
 	else if (iDB.equals("postgres"))
 	    dbType = DB_POSTGRES;
-	else
+	else if (iDB.equals("mysql"))
+            dbType = DB_UNKNOWN;
+        else
 	{
 	    log.error("unknown database type '" + iDB + "'");
 	    return;
@@ -716,34 +719,44 @@ public class jTPCC implements jTPCCConfig
 	return dateFormat.format(new java.util.Date());
     }
 
-    synchronized private void updateStatusLine()
-    {
-	long currTimeMillis = System.currentTimeMillis();
+	private final SimpleDateFormat timeFormatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS");
 
-	if(currTimeMillis > sessionNextTimestamp)
+	private long prevNewOrderCounter = 0;
+	private long prevTransactionCount = 0;
+	private long prevTimeMillis = System.currentTimeMillis();
+
+	synchronized private void updateStatusLine()
 	{
-	    StringBuilder informativeText = new StringBuilder("");
-	    Formatter fmt = new Formatter(informativeText);
-	    double tpmC = (6000000*fastNewOrderCounter/(currTimeMillis - sessionStartTimestamp))/100.0;
-	    double tpmTotal = (6000000*transactionCount/(currTimeMillis - sessionStartTimestamp))/100.0;
+		long currTimeMillis = System.currentTimeMillis();
 
-	    sessionNextTimestamp += 1000;  /* update this every seconds */
+		if(currTimeMillis > sessionNextTimestamp) {
+			StringBuilder informativeText = new StringBuilder("");
+			Formatter fmt = new Formatter(informativeText);
+			double tpmC = 60000.0 * fastNewOrderCounter / (currTimeMillis - sessionStartTimestamp);
+			double tpmTotal = 60000.0 * transactionCount / (currTimeMillis - sessionStartTimestamp);
 
-	    fmt.format("Term-00, Running Average tpmTOTAL: %.2f", tpmTotal);
+			fmt.format("[%s]", timeFormatter.format(new Date()));
+			fmt.format("\tAverage tpmC: %.2f", tpmC);
+			//fmt.format("\tAverage tpmTOTAL: %.2f", tpmTotal);
 
-	    /* XXX What is the meaning of these numbers? */
-	    recentTpmC = (fastNewOrderCounter - sessionNextKounter) * 12;
-	    recentTpmTotal= (transactionCount-sessionNextKounter)*12;
-	    sessionNextKounter = fastNewOrderCounter;
-	    fmt.format("    Current tpmTOTAL: %d", recentTpmTotal);
+			double currentTpmC =
+				60000.0 * (fastNewOrderCounter - prevNewOrderCounter) / (currTimeMillis - prevTimeMillis);
+			double currentTpmTotal =
+				60000.0 * (transactionCount - prevTransactionCount) / (currTimeMillis - prevTimeMillis);
 
-	    long freeMem = Runtime.getRuntime().freeMemory() / (1024*1024);
-	    long totalMem = Runtime.getRuntime().totalMemory() / (1024*1024);
-	    fmt.format("    Memory Usage: %dMB / %dMB          ", (totalMem - freeMem), totalMem);
+			prevNewOrderCounter = fastNewOrderCounter;
+			prevTransactionCount = transactionCount;
+			prevTimeMillis = currTimeMillis;
 
-	    System.out.print(informativeText);
-	    for (int count = 0; count < 1+informativeText.length(); count++)
-		System.out.print("\b");
-	}
+			fmt.format("\tCurrent tpmC: %.2f", currentTpmC);
+			//fmt.format("\tCurrent tpmTOTAL: %.2f", currentTpmTotal);
+
+			long freeMem = Runtime.getRuntime().freeMemory() / (1024 * 1024);
+			long totalMem = Runtime.getRuntime().totalMemory() / (1024 * 1024);
+			fmt.format("\tMemory Usage: %dMB / %dMB", (totalMem - freeMem), totalMem);
+
+			System.out.println(informativeText);
+			sessionNextTimestamp += 5000;
+		}
     }
 }

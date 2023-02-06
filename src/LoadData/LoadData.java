@@ -145,7 +145,7 @@ public class LoadData
 	    try
 	    {
 		dbConn = DriverManager.getConnection(db, dbProps);
-		dbConn.setAutoCommit(false);
+		dbConn.setAutoCommit(true);
 		if (writeCSV)
 		    workers[i] = new LoadDataWorker(i, csvNullValue,
 							rnd.newRandom());

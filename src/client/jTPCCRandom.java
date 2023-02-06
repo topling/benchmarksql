@@ -144,24 +144,24 @@ public class jTPCCRandom
      *     is not an alphanumeric string. We can save ourselves a lot
      *     of UTF8 related trouble by producing alphanumeric only
      *     instead of cartoon style curse-bubbles.
-     */
+     */ 
     public String getAString(long x, long y)
     {
-	String result = new String();
 	long len = nextLong(x, y);
+	StringBuilder result = new StringBuilder((int)len);
 	long have = 1;
 
 	if (y <= 0)
-	    return result;
+	    return result.toString();
 
-	result += aStringChars[(int)nextLong(0, 51)];
+	result.append(aStringChars[(int)nextLong(0, 51)]);
 	while (have < len)
 	{
-	    result += aStringChars[(int)nextLong(0, 61)];
+	    result.append(aStringChars[(int)nextLong(0, 61)]);
 	    have++;
 	}
 
-	return result;
+	return result.toString();
     }
 
     /*
@@ -171,17 +171,17 @@ public class jTPCCRandom
      */
     public String getNString(long x, long y)
     {
-	String result = new String();
 	long len = nextLong(x, y);
+	StringBuilder result = new StringBuilder((int)len);
 	long have = 0;
 
 	while (have < len)
 	{
-	    result += (char)(nextLong((long)'0', (long)'9'));
+	    result.append((char)(nextLong((long)'0', (long)'9')));
 	    have++;
 	}
 
-	return result;
+	return result.toString();
     }
 
     /*

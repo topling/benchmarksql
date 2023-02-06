@@ -1635,12 +1635,15 @@ log.trace("w_zip=" + payment.w_zip + " d_zip=" + payment.d_zip);
 			 * higher than that.
 			 */
 			o_id = -1;
+			log.debug("Order is deleted by concurrent threads. Restart this transaction");
+			break;
 		    }
 		}
 
 		if (o_id < 0)
 		{
 		    // No undelivered NEW_ORDER found for this DISTRICT.
+		    db.rollback();
 		    continue;
 		}
 

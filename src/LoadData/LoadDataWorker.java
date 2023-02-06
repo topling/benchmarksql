@@ -337,7 +337,7 @@ public class LoadDataWorker implements Runnable
 	    stmtItem.clearBatch();
 	    stmtItem.close();
 
-	    dbConn.commit();
+	    // dbConn.commit();
 	}
 
     } // End loadItem()
@@ -760,7 +760,7 @@ public class LoadDataWorker implements Runnable
 	    }
 	}
 
-	if (!writeCSV)
-	    dbConn.commit();
+	// if (!writeCSV)
+	    // dbConn.commit();
     } // End loadWarehouse()
 }
