@@ -1,7 +1,7 @@
 db=mysql
 driver=com.mysql.jdbc.Driver
 //conn=jdbc:mysql://127.0.0.1:3306/tpcc?readOnlyPropagatesToServer=false&rewriteBatchedStatements=true&failOverReadOnly=false&connectTimeout=3000&socketTimeout=90000&allowMultiQueries=true&clobberStreamingResults=true&characterEncoding=utf8&netTimeoutForStreamingResults=0&autoReconnect=true
-conn=jdbc:mysql://127.0.0.1:3306/tpcc_rocksdb?useSSL=false&useServerPrepStmts=false&useConfigs=maxPerformance&rewriteBatchedStatements=true&netTimeoutForStreamingResults=0&connectTimeout=300000&socketTimeout=900000
+conn=jdbc:mysql://127.0.0.1:3306/tpcc?useSSL=false&useServerPrepStmts=false&useConfigs=maxPerformance&rewriteBatchedStatements=true&netTimeoutForStreamingResults=0&connectTimeout=300000&socketTimeout=900000
 //conn=jdbc:mysql://192.168.31.2:3306/tpcc_innodb?useSSL=false&useServerPrepStmts=false&useConfigs=maxPerformance&rewriteBatchedStatements=true&netTimeoutForStreamingResults=0&connectTimeout=300000&socketTimeout=900000
 user=test
 password=test1234
